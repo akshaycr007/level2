@@ -1,0 +1,4 @@
+Create user:
+- Username: appuser
+- Password: appuser
+- Home directory: /app/appuser
