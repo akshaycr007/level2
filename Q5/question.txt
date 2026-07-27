@@ -1,0 +1,1 @@
+Deploy PostgreSQL using Docker Compose with persistent storage.
