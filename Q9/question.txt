@@ -1,0 +1,3 @@
+Create cron job (2 AM daily):
+o Backup /var/log to /backup
+o Create tar archive with date
