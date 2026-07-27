@@ -1,0 +1,1 @@
+Configure UFW for SSH, HTTP and HTTPS. Allow SSH only from a specific subnet.
