@@ -1,0 +1,1 @@
+Configure HTTPS. with domain eg: pddtestapp.luluone.com - Create a self signed Certificate or do inform us and we shall share the Certificate.

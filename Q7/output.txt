@@ -1,0 +1,21 @@
+=== Testing HTTP to HTTPS Redirection ===
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.24.0 (Ubuntu)
+Date: Mon, 27 Jul 2026 12:01:51 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://pddtestapp.luluone.com/
+
+
+=== Testing HTTPS Endpoint (Self-Signed) ===
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Mon, 27 Jul 2026 12:01:51 GMT
+Content-Type: text/html
+Content-Length: 15
+Connection: keep-alive
+Last-Modified: Mon, 27 Jul 2026 10:20:43 GMT
+ETag: "6a6730fb-f"
+Accept-Ranges: bytes
+
