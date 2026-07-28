@@ -59,5 +59,26 @@ Configure Nginx as a reverse proxy listening on Port 80 to route incoming HTTP t
 3. **Activation & Test:** Enabled configuration, restarted Nginx service, and verified response using `curl -i http://localhost/`.
 EOF
 
+OUTPUT
 
+=== Docker Container Status ===
+CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS                                     NAMES
+f513ad9bb678   nginx:alpine   "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes   0.0.0.0:8082->80/tcp, [::]:8082->80/tcp   myapp1
+
+=== Reverse Proxy Test (Port 80 -> myapp1:8082) ===
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.24.0 (Ubuntu)
+Date: Mon, 27 Jul 2026 10:50:32 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://localhost/
+
+<html>
+<head><title>301 Moved Permanently</title></head>
+<body>
+<center><h1>301 Moved Permanently</h1></center>
+<hr><center>nginx/1.24.0 (Ubuntu)</center>
+</body>
+</html>
 
