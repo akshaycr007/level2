@@ -8,4 +8,9 @@ cat << 'EOF' > README.md
 4. Verify deployment using `sudo docker compose ps` and `pg_isready`.
 
 OUTPUT
+ === Docker Compose Status ===
+NAME          IMAGE         COMMAND                  SERVICE    CREATED         STATUS         PORTS
+postgres_db   postgres:16   "docker-entrypoint.s…"   postgres   3 minutes ago   Up 3 minutes   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
 
+=== PostgreSQL Readiness ===
+/var/run/postgresql:5432 - accepting connections
