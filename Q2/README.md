@@ -1,3 +1,8 @@
+Q1
+Configure UFW for SSH, HTTP and HTTPS. Allow SSH only from a specific subnet.
+
+
+
 cat << 'EOF' > README.md
 1. sudo ufw default deny incoming
 2. sudo ufw default allow outgoing
