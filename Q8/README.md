@@ -1,4 +1,28 @@
-# Question 8: Disk Maintenance Automation
+# Question 8:          
+Disk maintenance:
+Automatically delete files larger than 500MB daily under /app/appuser/data
+
+
+# ---------------------------------------------------------
+# Step 3: Create the Cleanup Script
+# ---------------------------------------------------------
+cat << 'EOF' > /app/appuser/clean_large_files.sh
+#!/bin/bash
+find /app/appuser/data -type f -size +500M -exec rm -f {} +
+EOF
+
+chmod +x /app/appuser/clean_large_files.sh
+
+# ---------------------------------------------------------
+# Step 4: Schedule Daily Cron Job (At Midnight)
+# ---------------------------------------------------------
+(crontab -l 2>/dev/null | grep -v "/app/appuser/clean_large_files.sh"; echo "0 0 * * * /app/appuser/clean_large_files.sh") | crontab -
+
+# ---------------------------------------------------------
+# Step 5: Test Execution & Generate output.txt
+# ---------------------------------------------------------
+# Create a dummy test file (> 500MB) to verify cleanup works
+fallocate -l 520M /app/appuser/data/test_520M_file.tmp 2>/dev/null || dd if=/dev/zero of=/app/appuser/data/test_520M_file.tmp bs=1M count=520 2>/dev/null
 
 ## Objective
 Automatically delete files larger than 500MB daily under `/app/appuser/data`.
