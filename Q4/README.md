@@ -1,3 +1,9 @@
+Q2
+Using user appuser:
+- Run nginx container named my-app1 on port 8082 with content "Welcome to PDD" in /app/appuser/data/app1
+- Run nginx container named my-app2 on port 8081 with content "Welcome to PDD official" in /app/appuser/data/app2
+- Data must be persistent using local storage or NFS.
+
 1. mkdir -p /app/appuser/data/app1 /app/appuser/data/app2
 2. echo "Welcome to PDD" > /app/appuser/data/app1/index.html
 3. echo "Welcome to PDD official" > /app/appuser/data/app2/index.html
