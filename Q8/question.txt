@@ -1,2 +1,0 @@
-Disk maintenance:
-Automatically delete files larger than 500MB daily under /app/appuser/data
