@@ -17,6 +17,10 @@ Update the package repository, upgrade all installed packages to their latest ve
    * **Command:** `sudo apt autoremove -y`
    * **Description:** Cleans up orphan packages and dependencies that were automatically installed but are no longer needed.
 
+
+
+OUTPUT
+
 akshay@servera:~/level2/Q1$ sudo apt update | tee output.txt
 [sudo] password for akshay:
 
