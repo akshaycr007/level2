@@ -1,1 +1,4 @@
-
+cat << 'EOF' > /app/appuser/clean_large_files.sh
+#!/bin/bash
+find /app/appuser/data -type f -size +500M -exec rm -f {} +
+EOF
