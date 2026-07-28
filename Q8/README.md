@@ -34,3 +34,21 @@ Automatically delete files larger than 500MB daily under `/app/appuser/data`.
    Configured a user crontab entry `0 0 * * * /app/appuser/clean_large_files.sh` to run every day at midnight.
 3. **Verification:**
    Tested with a temporary 520MB file and validated automated deletion in `output.txt`.
+
+
+OUTPUT
+=== Configured Cron Jobs ===
+0 0 * * * /app/appuser/clean_large_files.sh
+
+=== Directory Contents BEFORE Cleanup ===
+total 521M
+drwxrwxrwx 2 appuser appuser 4.0K Jul 27 08:02 app1
+drwxrwxrwx 2 appuser appuser 4.0K Jul 27 08:02 app2
+-rw-r--r-- 1 appuser appuser   15 Jul 23 07:48 index.html
+-rw-rw-r-- 1 appuser appuser 520M Jul 27 12:25 test_520M_file.tmp
+
+=== Directory Contents AFTER Cleanup ===
+total 12K
+drwxrwxrwx 2 appuser appuser 4.0K Jul 27 08:02 app1
+drwxrwxrwx 2 appuser appuser 4.0K Jul 27 08:02 app2
+-rw-r--r-- 1 appuser appuser   15 Jul 23 07:48 index.html
