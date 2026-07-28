@@ -1,1 +1,228 @@
+Question 1:  System Update, Upgrade & Cleanup
+step1
+sudo apt update
+--
+step2
+sudo apt upgrade -y
+--
+step3
+sudo apt autoremove -y
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Question 2:  Configure UFW for SSH, HTTP and HTTPS. Allow SSH only from a specific subnet.
+step1 
+sudo ufw default deny incoming
+
+step2
+sudo ufw default allow outgoing
+
+step3
+sudo ufw allow http
+
+step4
+sudo ufw allow https
+
+step5
+sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
+
+step6 
+sudo ufw --force enable
+
+step7
+sudo ufw status verbose
+
+OUTPUT
+
+Status: active Logging: on (low) Default: deny (incoming), allow (outgoing), deny (routed) New profiles: skip
+
+To Action From
+
+80/tcp ALLOW IN Anywhere
+443/tcp ALLOW IN Anywhere
+22/tcp ALLOW IN 192.168.50.0/24
+443 ALLOW IN Anywhere
+22/tcp ALLOW IN 192.168.1.0/24
+80/tcp (v6) ALLOW IN Anywhere (v6)
+443/tcp (v6) ALLOW IN Anywhere (v6)
+443 (v6) ALLOW IN Anywhere (v6)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Question 3: Create user:
+Username: appuser
+Password: appuser
+Home directory: /app/appuser
+
+step1
+sudo mkdir -p /app
+--
+step2
+sudo useradd -m -d /app/appuser appuser
+--
+step3
+echo "appuser:appuser" | sudo chpasswd
+--
+step4
+getent passwd appuser
+--
+step5
+ls -ld /app/appuser
+
+OUTPUT
+=== User Entry from /etc/passwd === appuser:x:1003:1008::/app/appuser:/bin/bash
+
+=== Home Directory Ownership === drwxr-x--- 4 appuser appuser 4096 Jul 23 07:48 /app/appuser
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Question 4:  Using user appuser:
+Run nginx container named my-app1 on port 8082 with content "Welcome to PDD" in /app/appuser/data/app1
+Run nginx container named my-app2 on port 8081 with content "Welcome to PDD official" in /app/appuser/data/app2
+Data must be persistent using local storage or NFS.
+
+step1 
+mkdir -p /app/appuser/data/app1 /app/appuser/data/app2
+--
+step2
+echo "Welcome to PDD" > /app/appuser/data/app1/index.html
+--
+step3
+echo "Welcome to PDD official" > /app/appuser/data/app2/index.html
+--
+step4
+sudo docker run -d --name my-app1 -p 8082:80 -v /app/appuser/data/app1:/usr/share/nginx/html nginx
+--
+step5
+sudo docker run -d --name my-app2 -p 8081:80 -v /app/appuser/data/app2:/usr/share/nginx/html nginx
+--
+step6
+curl http://localhost:8082
+--
+step7
+curl http://localhost:8081
+
+OUTPUT
+=== Running Docker Containers === CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES f394476b0d57 nginx "/docker-entrypoint.…" 22 minutes ago Up 22 minutes 0.0.0.0:8081->80/tcp, [::]:8081->80/tcp my-app2 d6062e49aa18 nginx "/docker-entrypoint.…" 23 minutes ago Up 23 minutes 0.0.0.0:8082->80/tcp, [::]:8082->80/tcp my-app1 5ede0dcadfa7 postgres:15-alpine "docker-entrypoint.s…" 4 days ago Up 3 hours 0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp postgres-db
+
+=== Testing my-app1 (Port 8082) === Welcome to PDD
+
+=== Testing my-app2 (Port 8081) === Welcome to PDD official
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Question 5: Deploy PostgreSQL using Docker Compose with persistent storage.
+
+step1
+mkdir -p Q5 && cd Q5
+--
+step2
+Create docker-compose.yml with PostgreSQL service and persistent volume.
+--
+step3
+sudo docker compose up -d
+--
+step4
+Verify deployment using sudo docker compose ps and pg_isready.
+
+OUTPUT
+=== Docker Compose Status === NAME IMAGE COMMAND SERVICE CREATED STATUS PORTS postgres_db postgres:16 "docker-entrypoint.s…" postgres 3 minutes ago Up 3 minutes 0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+
+=== PostgreSQL Readiness === /var/run/postgresql:5432 - accepting connections
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Question 6: Configure Nginx as a reverse proxy listening on Port 80 to route incoming HTTP traffic directly to container myapp1 running on host port 8082.
+
+step1
+sudo mkdir -p /app/appuser/data/app1 if [ ! -f /app/appuser/data/app1/index.html ]; then echo "Welcome to PDD" | sudo tee /app/appuser/data/app1/index.html fi
+--
+step2 
+sudo apt-get update && sudo apt-get install -y nginx
+sudo bash -c 'cat << "EOF" > /etc/nginx/sites-available/myapp1.conf server { listen 80; server_name _;
+
+location / {
+    proxy_pass http://127.0.0.1:8082;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+} EOF'
+--
+step3 
+sudo rm -f /etc/nginx/sites-enabled/default sudo ln -sf /etc/nginx/sites-available/myapp1.conf /etc/nginx/sites-enabled/ sudo nginx -t && sudo systemctl restart nginx
+--
+step4
+echo "=== Docker Container Status ===" > output.txt sudo docker ps --filter "name=myapp1" >> output.txt
+
+echo -e "\n=== Reverse Proxy Test (Port 80 -> myapp1:8082) ===" >> output.txt curl -i http://localhost/ >> output.txt
+
+
+OUTPUT
+
+=== Docker Container Status === CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES f513ad9bb678 nginx:alpine "/docker-entrypoint.…" 2 minutes ago Up 2 minutes 0.0.0.0:8082->80/tcp, [::]:8082->80/tcp myapp1
+
+=== Reverse Proxy Test (Port 80 -> myapp1:8082) === HTTP/1.1 301 Moved Permanently Server: nginx/1.24.0 (Ubuntu) Date: Mon, 27 Jul 2026 10:50:32 GMT Content-Type: text/html Content-Length: 178 Connection: keep-alive Location: https://localhost/
+
+<title>301 Moved Permanently</title>
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Question 7: configure HTTPS. with domain eg: pddtestapp.luluone.com - Create a self signed Certificate or do inform us and we shall share the Certificate.
+step1
+sudo mkdir -p /etc/nginx/ssl sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048
+-keyout /etc/nginx/ssl/pddtestapp.key
+-out /etc/nginx/ssl/pddtestapp.crt
+-subj "/C=IN/ST=State/L=City/O=PDD/OU=IT/CN=pddtestapp.luluone.com"
+--
+step2
+if ! grep -q "pddtestapp.luluone.com" /etc/hosts; then echo "127.0.0.1 pddtestapp.luluone.com" | sudo tee -a /etc/hosts fi
+--
+step3
+sudo bash -c 'cat << "EOF" > /etc/nginx/sites-available/pddtestapp_ssl.conf server { listen 80; server_name pddtestapp.luluone.com;
+
+# Redirect all HTTP traffic to HTTPS
+return 301 https://$host$request_uri;
+}
+
+server { listen 443 ssl; server_name pddtestapp.luluone.com;
+
+# SSL Certificate Details
+ssl_certificate /etc/nginx/ssl/pddtestapp.crt;
+ssl_certificate_key /etc/nginx/ssl/pddtestapp.key;
+
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_ciphers HIGH:!aNULL:!MD5;
+
+# Proxy traffic to myapp1 container running on port 8082
+location / {
+    proxy_pass http://127.0.0.1:8082;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+} EOF'
+--
+step4
+sudo rm -f /etc/nginx/sites-enabled/default sudo ln -sf /etc/nginx/sites-available/pddtestapp_ssl.conf /etc/nginx/sites-enabled/ sudo ufw allow 443/tcp 2>/dev/null || true sudo nginx -t && sudo systemctl restart nginx
+--
+
+OUTPUT
+
+=== Testing HTTP to HTTPS Redirection === HTTP/1.1 301 Moved Permanently Server: nginx/1.24.0 (Ubuntu) Date: Mon, 27 Jul 2026 12:01:51 GMT Content-Type: text/html Content-Length: 178 Connection: keep-alive Location: https://pddtestapp.luluone.com/
+
+=== Testing HTTPS Endpoint (Self-Signed) === HTTP/1.1 200 OK Server: nginx/1.24.0 (Ubuntu) Date: Mon, 27 Jul 2026 12:01:51 GMT Content-Type: text/html Content-Length: 15 Connection: keep-alive Last-Modified: Mon, 27 Jul 2026 10:20:43 GMT ETag: "6a6730fb-f" Accept-Ranges: bytes
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
