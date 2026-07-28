@@ -37,6 +37,7 @@ Automatically delete files larger than 500MB daily under `/app/appuser/data`.
 
 
 OUTPUT
+
 === Configured Cron Jobs ===
 0 0 * * * /app/appuser/clean_large_files.sh
 
