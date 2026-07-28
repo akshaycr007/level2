@@ -47,3 +47,8 @@ Schedule a daily cron job at 2:00 AM to archive `/var/log` into `/backup` as a d
    Configured cron schedule `0 2 * * * /app/appuser/backup_logs.sh` to run every day at 02:00 AM.
 3. **Verification:**
    Tested manual execution and confirmed output archive created in `/backup`.
+
+OUTPUT
+Create cron job (2 AM daily):
+o Backup /var/log to /backup
+o Create tar archive with date
